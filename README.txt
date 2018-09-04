@@ -1,1 +1,1 @@
-Replace vars: zabbix_server and zabbix_agent_link with your desired values.
+Replace vars: zabbix_server and zabbix_agent_link with your desired values and hosts wioth your target servers.

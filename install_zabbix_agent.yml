@@ -4,7 +4,6 @@
     zabbix_server: zabbix.home.local
     zabbix_agent_link: https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-agent-3.0.9-1.el7.x86_64.rpm
   tasks:
-        #install packages for a functional webserver
         - name: Install wget
           yum: name=wget state=present
 
