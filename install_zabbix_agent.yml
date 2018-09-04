@@ -1,0 +1,47 @@
+---
+- hosts: web-servers
+  vars:
+    zabbix_server: zabbix.home.local
+    zabbix_agent_link: https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/zabbix-agent-3.0.9-1.el7.x86_64.rpm
+  tasks:
+        #install packages for a functional webserver
+        - name: Install wget
+          yum: name=wget state=present
+
+        - name: get zabbix agent with wget
+          shell: wget {{ zabbix_agent_link }} -O /tmp/zabbix-agent.rpm
+
+        - name: install zabbix agent
+          yum:
+            name: /tmp/zabbix-agent.rpm
+            state: present
+
+        - name: start zabbix agent
+          service: name=zabbix-agent state=started enabled=yes
+
+        - name: edit zabbix_agentd.conf  Server
+          lineinfile:
+            path: /etc/zabbix/zabbix_agentd.conf
+            regexp: '^Server='
+            line: 'Server={{ zabbix_server }}'
+          notify: reset zabbix-agent
+
+        - name: edit zabbix_agentd.conf - ServerActive
+          lineinfile:
+            path: /etc/zabbix/zabbix_agentd.conf
+            regexp: '^ServerActive='
+            line: 'ServerActive={{ zabbix_server }}'
+          notify: reset zabbix-agent
+        
+        - name: edit zabbix_agentd.conf - Hostname
+          lineinfile:
+            path: /etc/zabbix/zabbix_agentd.conf
+            regexp: '^Hostname='
+            line: 'Hostname={{ ansible_fqdn }}'
+          notify: reset zabbix-agent
+
+  handlers:          
+        - name: reset zabbix-agent
+          service: 
+                name: zabbix-agent 
+                state: restarted
